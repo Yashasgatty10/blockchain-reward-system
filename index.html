@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Reward System</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .card {
+      background: #1e293b;
+      padding: 30px;
+      border-radius: 12px;
+      width: 320px;
+      text-align: center;
+    }
+
+    select, input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: none;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px;
+      width: 100%;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #2563eb;
+    }
+
+    .status {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    #selectedUser {
+      margin-top: 8px;
+      font-weight: bold;
+      color: #3b82f6;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="card">
+  <h2>Reward System</h2>
+
+  <!-- USER DROPDOWN -->
+  <select id="userSelect">
+    <option value="">Select User</option>
+    <option value="0x5047261394851A68BC76f59A5B1Ab24555DD1729">User1</option>
+    <option value="0xFRIEND_ADDRESS">User2</option>
+  </select>
+
+  <!-- DISPLAY SELECTED USER -->
+  <p id="selectedUser">No user selected</p>
+
+  <!-- AMOUNT INPUT -->
+  <input id="amount" type="number" placeholder="Enter RWT amount" />
+
+  <button onclick="sendReward()">Send Reward</button>
+
+  <div class="status" id="status"></div>
+</div>
+
+<script>
+const userSelect = document.getElementById("userSelect");
+const selectedUserText = document.getElementById("selectedUser");
+
+// Show selected user
+userSelect.onchange = () => {
+  const username = userSelect.options[userSelect.selectedIndex].text;
+
+  if (userSelect.value === "") {
+    selectedUserText.innerText = "No user selected";
+  } else {
+    selectedUserText.innerText = "Selected: " + username;
+  }
+};
+
+// Send reward
+async function sendReward() {
+  const address = userSelect.value;
+  const username = userSelect.options[userSelect.selectedIndex].text;
+  const amount = document.getElementById("amount").value;
+  const status = document.getElementById("status");
+
+  if (!address || !amount) {
+    status.innerText = "Select user and enter amount";
+    return;
+  }
+
+  status.innerText = "Sending reward...";
+
+  try {
+    const res = await fetch("http://localhost:3000/reward", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        address: address,
+        amount: amount,
+        username: username
+      })
+    });
+
+    const data = await res.json();
+
+    status.innerText = "✅ " + data.message;
+
+  } catch (err) {
+    status.innerText = "❌ Error sending reward";
+  }
+}
+</script>
+
+</body>
+</html>
